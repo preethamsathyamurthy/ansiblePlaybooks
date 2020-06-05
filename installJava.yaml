@@ -1,0 +1,49 @@
+---
+- hosts: local
+  vars:
+    download_url: https://download.oracle.com/otn/java/jdk/8u251-b08/3d5a2bb8f8d4428bbe94aed7ec7ae784/jdk-8u251-linux-x64.tar.gz
+    download_folder: ~/software/java
+    java_name: "{{download_folder}}/jdk1.8.2_05"
+    java_archive: "{{download_folder}}/jdk-8u251-linux-x64.tar.gz"
+    java_alternative: "/usr/bin/java"
+  tasks:
+  - name: create folder if not exists
+    file:
+     path: "{{ download_folder }}"
+     state: directory
+     owner: preethamsathyamurthy
+     group: preethamsathyamurthy
+     mode: 0775
+
+  - name: create java alternative folder
+    file:
+     path: "{{ java_alternative }}"
+     state: directory
+     owner: preethamsathyamurthy
+     group: preethamsathyamurthy
+     mode: 0775
+
+  - name: Download file with custom HTTP headers
+    get_url:
+     url: "{{ download_url }}"
+     dest: "{{ java_archive }}"
+     headers:
+      Cookie: 'oraclelicense=accept-securebackup-cookie'
+
+  - name: unpack archive
+    command: "tar -zxvf '{{ java_archive }}' -C '{{ download_folder }}' creates='{{ java_name }}'"
+	
+  - name: Fix ownership
+    file:
+     state=directory
+     path='{{ java_name }}'
+     owner=root
+     group=root
+     recurse=yes
+    become: true
+
+  - name: Make Java available for system
+    command: 'alternatives --install "/usr/bin/java" "java" "{{ java_name }}/bin/java" 2000'
+
+  - name: Clean up
+    file: state=absent path={{ java_archive }}
