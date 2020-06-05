@@ -32,7 +32,7 @@
 
   - name: unpack archive
     command: "tar -zxvf '{{ java_archive }}' -C '{{ download_folder }}' creates='{{ java_name }}'"
-	
+    
   - name: Fix ownership
     file:
      state=directory
