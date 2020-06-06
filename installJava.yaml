@@ -29,7 +29,8 @@
      dest: "{{ java_archive }}"
      headers:
       Cookie: 'oraclelicense=accept-securebackup-cookie'
-
+     mode: 0775
+     
   - name: unpack archive
     command: "tar -zxvf '{{ java_archive }}' -C '{{ download_folder }}' creates='{{ java_name }}'"
     
